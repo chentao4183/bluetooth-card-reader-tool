@@ -32,6 +32,10 @@ TestResults/
 # PaddleOCR 模型缓存
 .paddleocr/
 
+# Claude Code 工作目录
+.claude/
+**/.claude/
+
 # Windows 临时文件
 Thumbs.db
 Desktop.ini

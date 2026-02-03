@@ -133,7 +133,7 @@ public class ServiceConfig
     /// <summary>
     /// V2 系统配置
     /// </summary>
-    public SystemConfig V2 { get; set; } = new();
+    public SystemConfig V2 { get; set; } = new("http://10.10.5.116:8080/api/verify", "http://10.10.5.116:8080/api/bind");
 
     /// <summary>
     /// 是否启用洗消验证
@@ -160,6 +160,22 @@ public class SystemConfig
     /// 绑定接口 URL
     /// </summary>
     public string BindUrl { get; set; } = "";
+
+    /// <summary>
+    /// 构造函数 - 用于设置默认值
+    /// </summary>
+    public SystemConfig()
+    {
+    }
+
+    /// <summary>
+    /// 构造函数 - 用于设置默认值
+    /// </summary>
+    public SystemConfig(string verifyUrl, string bindUrl)
+    {
+        VerifyUrl = verifyUrl;
+        BindUrl = bindUrl;
+    }
 }
 
 /// <summary>

@@ -42,6 +42,30 @@ public partial class MainForm : Form
     private Button? _btnSaveOcrConfig;
     private Button? _btnResetOcrConfig;
 
+    // 服务配置页控件
+    private RadioButton? _rbV1;
+    private RadioButton? _rbV2;
+    private GroupBox? _grpV1Config;
+    private GroupBox? _grpV2Config;
+    private TextBox? _txtV1VerifyUrl;
+    private TextBox? _txtV1BindUrl;
+    private TextBox? _txtV2VerifyUrl;
+    private TextBox? _txtV2BindUrl;
+    private CheckBox? _chkEnableVerify;
+    private CheckBox? _chkShowResultPopup;
+    private Button? _btnTestConnection;
+    private Button? _btnSaveServiceConfig;
+
+    // 后台配置页控件
+    private RadioButton? _rbManualSubmit;
+    private RadioButton? _rbAutoSubmit;
+    private NumericUpDown? _numCountdown;
+    private CheckBox? _chkAutoStart;
+    private CheckBox? _chkEnableFloatingBall;
+    private CheckBox? _chkEnableService;
+    private Button? _btnSaveBackgroundConfig;
+    private Button? _btnResetBackgroundConfig;
+
     public MainForm()
     {
         InitializeComponent();
@@ -626,14 +650,208 @@ public partial class MainForm : Form
     {
         var tab = new TabPage("服务配置");
 
-        var label = new Label
+        int yPos = 20;
+
+        // ===== 系统版本选择 =====
+        var lblVersion = new Label
         {
-            Text = "服务配置页面（待实现）",
-            Location = new Point(20, 20),
-            Size = new Size(900, 30),
-            Font = new Font("微软雅黑", 12)
+            Text = "系统版本:",
+            Location = new Point(20, yPos),
+            Size = new Size(80, 25),
+            Font = new Font("微软雅黑", 10),
+            TextAlign = ContentAlignment.MiddleRight
         };
-        tab.Controls.Add(label);
+        tab.Controls.Add(lblVersion);
+
+        _rbV1 = new RadioButton
+        {
+            Text = "V1.0",
+            Location = new Point(110, yPos),
+            Size = new Size(80, 25),
+            Font = new Font("微软雅黑", 10),
+            Checked = _settings.Service.Version == "V1.0"
+        };
+        _rbV1.CheckedChanged += OnVersionChanged;
+        tab.Controls.Add(_rbV1);
+
+        _rbV2 = new RadioButton
+        {
+            Text = "V2.0",
+            Location = new Point(200, yPos),
+            Size = new Size(80, 25),
+            Font = new Font("微软雅黑", 10),
+            Checked = _settings.Service.Version == "V2.0"
+        };
+        _rbV2.CheckedChanged += OnVersionChanged;
+        tab.Controls.Add(_rbV2);
+
+        yPos += 40;
+
+        // ===== V1 系统配置组 =====
+        _grpV1Config = new GroupBox
+        {
+            Text = "V1 系统配置",
+            Location = new Point(20, yPos),
+            Size = new Size(900, 100),
+            Font = new Font("微软雅黑", 10)
+        };
+        tab.Controls.Add(_grpV1Config);
+
+        var lblV1Verify = new Label
+        {
+            Text = "验证接口:",
+            Location = new Point(15, 35),
+            Size = new Size(80, 25),
+            Font = new Font("微软雅黑", 9),
+            TextAlign = ContentAlignment.MiddleRight
+        };
+        _grpV1Config.Controls.Add(lblV1Verify);
+
+        _txtV1VerifyUrl = new TextBox
+        {
+            Location = new Point(105, 33),
+            Size = new Size(770, 25),
+            Font = new Font("微软雅黑", 9),
+            Text = _settings.Service.V1.VerifyUrl
+        };
+        _grpV1Config.Controls.Add(_txtV1VerifyUrl);
+
+        var lblV1Bind = new Label
+        {
+            Text = "绑定接口:",
+            Location = new Point(15, 70),
+            Size = new Size(80, 25),
+            Font = new Font("微软雅黑", 9),
+            TextAlign = ContentAlignment.MiddleRight
+        };
+        _grpV1Config.Controls.Add(lblV1Bind);
+
+        _txtV1BindUrl = new TextBox
+        {
+            Location = new Point(105, 68),
+            Size = new Size(770, 25),
+            Font = new Font("微软雅黑", 9),
+            Text = _settings.Service.V1.BindUrl
+        };
+        _grpV1Config.Controls.Add(_txtV1BindUrl);
+
+        yPos += 110;
+
+        // ===== V2 系统配置组 =====
+        _grpV2Config = new GroupBox
+        {
+            Text = "V2 系统配置",
+            Location = new Point(20, yPos),
+            Size = new Size(900, 100),
+            Font = new Font("微软雅黑", 10)
+        };
+        tab.Controls.Add(_grpV2Config);
+
+        var lblV2Verify = new Label
+        {
+            Text = "验证接口:",
+            Location = new Point(15, 35),
+            Size = new Size(80, 25),
+            Font = new Font("微软雅黑", 9),
+            TextAlign = ContentAlignment.MiddleRight
+        };
+        _grpV2Config.Controls.Add(lblV2Verify);
+
+        _txtV2VerifyUrl = new TextBox
+        {
+            Location = new Point(105, 33),
+            Size = new Size(770, 25),
+            Font = new Font("微软雅黑", 9),
+            Text = _settings.Service.V2.VerifyUrl
+        };
+        _grpV2Config.Controls.Add(_txtV2VerifyUrl);
+
+        var lblV2Bind = new Label
+        {
+            Text = "绑定接口:",
+            Location = new Point(15, 70),
+            Size = new Size(80, 25),
+            Font = new Font("微软雅黑", 9),
+            TextAlign = ContentAlignment.MiddleRight
+        };
+        _grpV2Config.Controls.Add(lblV2Bind);
+
+        _txtV2BindUrl = new TextBox
+        {
+            Location = new Point(105, 68),
+            Size = new Size(770, 25),
+            Font = new Font("微软雅黑", 9),
+            Text = _settings.Service.V2.BindUrl
+        };
+        _grpV2Config.Controls.Add(_txtV2BindUrl);
+
+        yPos += 110;
+
+        // ===== 功能设置组 =====
+        var grpFeatures = new GroupBox
+        {
+            Text = "功能设置",
+            Location = new Point(20, yPos),
+            Size = new Size(900, 80),
+            Font = new Font("微软雅黑", 10)
+        };
+        tab.Controls.Add(grpFeatures);
+
+        _chkEnableVerify = new CheckBox
+        {
+            Text = "启用洗消验证",
+            Location = new Point(15, 30),
+            Size = new Size(200, 25),
+            Font = new Font("微软雅黑", 10),
+            Checked = _settings.Service.EnableVerify
+        };
+        grpFeatures.Controls.Add(_chkEnableVerify);
+
+        _chkShowResultPopup = new CheckBox
+        {
+            Text = "显示结果弹窗",
+            Location = new Point(230, 30),
+            Size = new Size(200, 25),
+            Font = new Font("微软雅黑", 10),
+            Checked = _settings.Service.ShowResultPopup
+        };
+        grpFeatures.Controls.Add(_chkShowResultPopup);
+
+        yPos += 90;
+
+        // ===== 底部按钮 =====
+        _btnTestConnection = new Button
+        {
+            Text = "测试连接",
+            Location = new Point(610, yPos),
+            Size = new Size(100, 35),
+            Font = new Font("微软雅黑", 10)
+        };
+        _btnTestConnection.Click += BtnTestConnection_Click;
+        tab.Controls.Add(_btnTestConnection);
+
+        _btnSaveServiceConfig = new Button
+        {
+            Text = "保存配置",
+            Location = new Point(720, yPos),
+            Size = new Size(100, 35),
+            Font = new Font("微软雅黑", 10)
+        };
+        _btnSaveServiceConfig.Click += BtnSaveServiceConfig_Click;
+        tab.Controls.Add(_btnSaveServiceConfig);
+
+        var btnResetServiceConfig = new Button
+        {
+            Text = "恢复默认",
+            Location = new Point(830, yPos),
+            Size = new Size(100, 35),
+            Font = new Font("微软雅黑", 10)
+        };
+        btnResetServiceConfig.Click += BtnResetServiceConfig_Click;
+        tab.Controls.Add(btnResetServiceConfig);
+
+        // 加载配置并更新 UI
+        LoadServiceConfig();
 
         return tab;
     }
@@ -642,14 +860,142 @@ public partial class MainForm : Form
     {
         var tab = new TabPage("后台配置");
 
-        var label = new Label
+        int yPos = 20;
+
+        // ===== 提交模式组 =====
+        var grpSubmitMode = new GroupBox
         {
-            Text = "后台配置页面（待实现）",
-            Location = new Point(20, 20),
-            Size = new Size(900, 30),
-            Font = new Font("微软雅黑", 12)
+            Text = "提交模式",
+            Location = new Point(20, yPos),
+            Size = new Size(900, 100),
+            Font = new Font("微软雅黑", 10)
         };
-        tab.Controls.Add(label);
+        tab.Controls.Add(grpSubmitMode);
+
+        _rbManualSubmit = new RadioButton
+        {
+            Text = "手动提交 - 需要点击提交按钮",
+            Location = new Point(15, 30),
+            Size = new Size(300, 25),
+            Font = new Font("微软雅黑", 10),
+            Checked = _settings.Background.SubmitMode == "manual"
+        };
+        _rbManualSubmit.CheckedChanged += OnSubmitModeChanged;
+        grpSubmitMode.Controls.Add(_rbManualSubmit);
+
+        _rbAutoSubmit = new RadioButton
+        {
+            Text = "自动提交 - 倒计时后自动提交:",
+            Location = new Point(15, 65),
+            Size = new Size(250, 25),
+            Font = new Font("微软雅黑", 10),
+            Checked = _settings.Background.SubmitMode == "auto"
+        };
+        _rbAutoSubmit.CheckedChanged += OnSubmitModeChanged;
+        grpSubmitMode.Controls.Add(_rbAutoSubmit);
+
+        _numCountdown = new NumericUpDown
+        {
+            Location = new Point(275, 63),
+            Size = new Size(60, 25),
+            Font = new Font("微软雅黑", 10),
+            Minimum = 1,
+            Maximum = 60,
+            Value = _settings.Background.Countdown,
+            Enabled = _settings.Background.SubmitMode == "auto"
+        };
+        grpSubmitMode.Controls.Add(_numCountdown);
+
+        var lblSeconds = new Label
+        {
+            Text = "秒",
+            Location = new Point(345, 65),
+            Size = new Size(30, 25),
+            Font = new Font("微软雅黑", 10),
+            TextAlign = ContentAlignment.MiddleLeft
+        };
+        grpSubmitMode.Controls.Add(lblSeconds);
+
+        yPos += 110;
+
+        // ===== 启动设置组 =====
+        var grpStartup = new GroupBox
+        {
+            Text = "启动设置",
+            Location = new Point(20, yPos),
+            Size = new Size(900, 80),
+            Font = new Font("微软雅黑", 10)
+        };
+        tab.Controls.Add(grpStartup);
+
+        _chkAutoStart = new CheckBox
+        {
+            Text = "开机自启动",
+            Location = new Point(15, 30),
+            Size = new Size(200, 25),
+            Font = new Font("微软雅黑", 10),
+            Checked = _settings.Background.AutoStart
+        };
+        _chkAutoStart.CheckedChanged += OnAutoStartChanged;
+        grpStartup.Controls.Add(_chkAutoStart);
+
+        yPos += 90;
+
+        // ===== 功能开关组 =====
+        var grpFeatures = new GroupBox
+        {
+            Text = "功能开关",
+            Location = new Point(20, yPos),
+            Size = new Size(900, 100),
+            Font = new Font("微软雅黑", 10)
+        };
+        tab.Controls.Add(grpFeatures);
+
+        _chkEnableFloatingBall = new CheckBox
+        {
+            Text = "启用浮球输入（手动输入卡号）",
+            Location = new Point(15, 30),
+            Size = new Size(300, 25),
+            Font = new Font("微软雅黑", 10),
+            Checked = _settings.Background.EnableFloatingBall
+        };
+        grpFeatures.Controls.Add(_chkEnableFloatingBall);
+
+        _chkEnableService = new CheckBox
+        {
+            Text = "启用后台服务（监听刷卡事件）",
+            Location = new Point(15, 65),
+            Size = new Size(300, 25),
+            Font = new Font("微软雅黑", 10),
+            Checked = _settings.Background.EnableService
+        };
+        grpFeatures.Controls.Add(_chkEnableService);
+
+        yPos += 110;
+
+        // ===== 底部按钮 =====
+        _btnSaveBackgroundConfig = new Button
+        {
+            Text = "保存配置",
+            Location = new Point(720, yPos),
+            Size = new Size(100, 35),
+            Font = new Font("微软雅黑", 10)
+        };
+        _btnSaveBackgroundConfig.Click += BtnSaveBackgroundConfig_Click;
+        tab.Controls.Add(_btnSaveBackgroundConfig);
+
+        _btnResetBackgroundConfig = new Button
+        {
+            Text = "恢复默认",
+            Location = new Point(830, yPos),
+            Size = new Size(100, 35),
+            Font = new Font("微软雅黑", 10)
+        };
+        _btnResetBackgroundConfig.Click += BtnResetBackgroundConfig_Click;
+        tab.Controls.Add(_btnResetBackgroundConfig);
+
+        // 加载配置
+        LoadBackgroundConfig();
 
         return tab;
     }
@@ -1321,6 +1667,309 @@ public partial class MainForm : Form
             RefreshFieldsList();
             RefreshTestFieldComboBox();
             Log("已清空 OCR 字段");
+        }
+    }
+
+    #endregion
+
+    #region 服务配置页事件处理
+
+    private void LoadServiceConfig()
+    {
+        // 更新版本选择高亮
+        UpdateVersionGroupBoxStyle();
+    }
+
+    private void OnVersionChanged(object? sender, EventArgs e)
+    {
+        UpdateVersionGroupBoxStyle();
+    }
+
+    private void UpdateVersionGroupBoxStyle()
+    {
+        if (_grpV1Config == null || _grpV2Config == null) return;
+
+        if (_rbV1?.Checked == true)
+        {
+            _grpV1Config.Font = new Font("微软雅黑", 10, FontStyle.Bold);
+            _grpV1Config.ForeColor = Color.Blue;
+            _grpV2Config.Font = new Font("微软雅黑", 10, FontStyle.Regular);
+            _grpV2Config.ForeColor = Color.Black;
+        }
+        else
+        {
+            _grpV1Config.Font = new Font("微软雅黑", 10, FontStyle.Regular);
+            _grpV1Config.ForeColor = Color.Black;
+            _grpV2Config.Font = new Font("微软雅黑", 10, FontStyle.Bold);
+            _grpV2Config.ForeColor = Color.Blue;
+        }
+    }
+
+    private async void BtnTestConnection_Click(object? sender, EventArgs e)
+    {
+        if (_btnTestConnection == null) return;
+
+        try
+        {
+            _btnTestConnection.Enabled = false;
+            _btnTestConnection.Text = "测试中...";
+            Application.DoEvents();
+
+            string verifyUrl = "";
+            string bindUrl = "";
+
+            if (_rbV1?.Checked == true)
+            {
+                verifyUrl = _txtV1VerifyUrl?.Text ?? "";
+                bindUrl = _txtV1BindUrl?.Text ?? "";
+            }
+            else
+            {
+                verifyUrl = _txtV2VerifyUrl?.Text ?? "";
+                bindUrl = _txtV2BindUrl?.Text ?? "";
+            }
+
+            // 验证 URL 格式
+            if (string.IsNullOrWhiteSpace(verifyUrl) && string.IsNullOrWhiteSpace(bindUrl))
+            {
+                MessageBox.Show("请至少输入一个接口 URL", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            var results = new List<string>();
+
+            // 测试验证接口
+            if (!string.IsNullOrWhiteSpace(verifyUrl))
+            {
+                if (!Uri.TryCreate(verifyUrl, UriKind.Absolute, out var uri) ||
+                    (uri.Scheme != "http" && uri.Scheme != "https"))
+                {
+                    results.Add($"验证接口 URL 格式无效: {verifyUrl}");
+                }
+                else
+                {
+                    try
+                    {
+                        using var client = new HttpClient();
+                        client.Timeout = TimeSpan.FromSeconds(5);
+                        var response = await client.GetAsync(verifyUrl);
+                        results.Add($"验证接口: {(response.IsSuccessStatusCode ? "连接成功" : $"返回状态码 {response.StatusCode}")}");
+                    }
+                    catch (Exception ex)
+                    {
+                        results.Add($"验证接口: 连接失败 - {ex.Message}");
+                    }
+                }
+            }
+
+            // 测试绑定接口
+            if (!string.IsNullOrWhiteSpace(bindUrl))
+            {
+                if (!Uri.TryCreate(bindUrl, UriKind.Absolute, out var uri) ||
+                    (uri.Scheme != "http" && uri.Scheme != "https"))
+                {
+                    results.Add($"绑定接口 URL 格式无效: {bindUrl}");
+                }
+                else
+                {
+                    try
+                    {
+                        using var client = new HttpClient();
+                        client.Timeout = TimeSpan.FromSeconds(5);
+                        var response = await client.GetAsync(bindUrl);
+                        results.Add($"绑定接口: {(response.IsSuccessStatusCode ? "连接成功" : $"返回状态码 {response.StatusCode}")}");
+                    }
+                    catch (Exception ex)
+                    {
+                        results.Add($"绑定接口: 连接失败 - {ex.Message}");
+                    }
+                }
+            }
+
+            string message = string.Join("\n", results);
+            Log($"接口测试结果:\n{message}");
+            MessageBox.Show(message, "测试结果", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+        catch (Exception ex)
+        {
+            Log($"测试连接失败: {ex.Message}");
+            MessageBox.Show($"测试连接失败: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+        finally
+        {
+            if (_btnTestConnection != null)
+            {
+                _btnTestConnection.Enabled = true;
+                _btnTestConnection.Text = "测试连接";
+            }
+        }
+    }
+
+    private void BtnSaveServiceConfig_Click(object? sender, EventArgs e)
+    {
+        try
+        {
+            // 保存版本选择
+            _settings.Service.Version = _rbV1?.Checked == true ? "V1.0" : "V2.0";
+
+            // 保存 V1 配置
+            _settings.Service.V1.VerifyUrl = _txtV1VerifyUrl?.Text ?? "";
+            _settings.Service.V1.BindUrl = _txtV1BindUrl?.Text ?? "";
+
+            // 保存 V2 配置
+            _settings.Service.V2.VerifyUrl = _txtV2VerifyUrl?.Text ?? "";
+            _settings.Service.V2.BindUrl = _txtV2BindUrl?.Text ?? "";
+
+            // 保存功能开关
+            _settings.Service.EnableVerify = _chkEnableVerify?.Checked ?? true;
+            _settings.Service.ShowResultPopup = _chkShowResultPopup?.Checked ?? true;
+
+            ConfigManager.Save(_settings);
+            Log("服务配置已保存");
+            MessageBox.Show("配置已保存", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+        catch (Exception ex)
+        {
+            Log($"保存配置失败: {ex.Message}");
+            MessageBox.Show($"保存配置失败: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+    }
+
+    private void BtnResetServiceConfig_Click(object? sender, EventArgs e)
+    {
+        var result = MessageBox.Show("确定要恢复默认配置吗？", "确认", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+        if (result == DialogResult.Yes)
+        {
+            // 恢复 V2 默认配置
+            if (_txtV2VerifyUrl != null)
+                _txtV2VerifyUrl.Text = "http://10.10.5.116:8080/api/verify";
+            if (_txtV2BindUrl != null)
+                _txtV2BindUrl.Text = "http://10.10.5.116:8080/api/bind";
+
+            // 清空 V1 配置
+            if (_txtV1VerifyUrl != null)
+                _txtV1VerifyUrl.Text = "";
+            if (_txtV1BindUrl != null)
+                _txtV1BindUrl.Text = "";
+
+            // 恢复功能开关
+            if (_chkEnableVerify != null)
+                _chkEnableVerify.Checked = true;
+            if (_chkShowResultPopup != null)
+                _chkShowResultPopup.Checked = true;
+
+            // 选择 V2.0
+            if (_rbV2 != null)
+                _rbV2.Checked = true;
+
+            Log("已恢复默认配置");
+        }
+    }
+
+    #endregion
+
+    #region 后台配置页事件处理
+
+    private void LoadBackgroundConfig()
+    {
+        // 配置已在控件初始化时加载，这里可以添加额外的初始化逻辑
+    }
+
+    private void OnSubmitModeChanged(object? sender, EventArgs e)
+    {
+        if (_numCountdown == null) return;
+
+        // 根据提交模式启用/禁用倒计时输入框
+        _numCountdown.Enabled = _rbAutoSubmit?.Checked == true;
+    }
+
+    private void OnAutoStartChanged(object? sender, EventArgs e)
+    {
+        if (_chkAutoStart == null) return;
+
+        try
+        {
+            if (_chkAutoStart.Checked)
+            {
+                // 添加到开机自启动
+                if (AutoStartupManager.AddToStartup())
+                {
+                    Log("已添加到开机自启动");
+                }
+                else
+                {
+                    Log("添加到开机自启动失败");
+                    MessageBox.Show("添加到开机自启动失败，请检查权限", "警告", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    _chkAutoStart.Checked = false;
+                }
+            }
+            else
+            {
+                // 从开机自启动中移除
+                if (AutoStartupManager.RemoveFromStartup())
+                {
+                    Log("已从开机自启动中移除");
+                }
+                else
+                {
+                    Log("从开机自启动中移除失败");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Log($"设置开机自启动失败: {ex.Message}");
+            MessageBox.Show($"设置开机自启动失败: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            _chkAutoStart.Checked = false;
+        }
+    }
+
+    private void BtnSaveBackgroundConfig_Click(object? sender, EventArgs e)
+    {
+        try
+        {
+            // 保存提交模式
+            _settings.Background.SubmitMode = _rbManualSubmit?.Checked == true ? "manual" : "auto";
+            _settings.Background.Countdown = (int)(_numCountdown?.Value ?? 5);
+
+            // 保存开机自启动
+            _settings.Background.AutoStart = _chkAutoStart?.Checked ?? false;
+
+            // 保存功能开关
+            _settings.Background.EnableFloatingBall = _chkEnableFloatingBall?.Checked ?? false;
+            _settings.Background.EnableService = _chkEnableService?.Checked ?? true;
+
+            ConfigManager.Save(_settings);
+            Log("后台配置已保存");
+            MessageBox.Show("配置已保存", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+        catch (Exception ex)
+        {
+            Log($"保存配置失败: {ex.Message}");
+            MessageBox.Show($"保存配置失败: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+    }
+
+    private void BtnResetBackgroundConfig_Click(object? sender, EventArgs e)
+    {
+        var result = MessageBox.Show("确定要恢复默认配置吗？", "确认", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+        if (result == DialogResult.Yes)
+        {
+            // 恢复默认值
+            if (_rbManualSubmit != null)
+                _rbManualSubmit.Checked = true;
+            if (_numCountdown != null)
+                _numCountdown.Value = 5;
+            if (_chkAutoStart != null && _chkAutoStart.Checked)
+            {
+                _chkAutoStart.Checked = false; // 这会触发 OnAutoStartChanged 移除自启动
+            }
+            if (_chkEnableFloatingBall != null)
+                _chkEnableFloatingBall.Checked = false;
+            if (_chkEnableService != null)
+                _chkEnableService.Checked = true;
+
+            Log("已恢复默认配置");
         }
     }
 

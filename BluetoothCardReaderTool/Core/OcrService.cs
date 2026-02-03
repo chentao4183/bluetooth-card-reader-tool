@@ -100,6 +100,38 @@ public class OcrService : IDisposable
     }
 
     /// <summary>
+    /// 转换图像为 RGB 格式（PaddleOCR 需要 3 通道）
+    /// </summary>
+    private Mat ConvertToRgb(Mat source)
+    {
+        // 检查通道数
+        if (source.Channels() == 3)
+        {
+            // 已经是 RGB，直接返回
+            return source.Clone();
+        }
+        else if (source.Channels() == 4)
+        {
+            // RGBA 转 RGB
+            var rgb = new Mat();
+            Cv2.CvtColor(source, rgb, ColorConversionCodes.BGRA2BGR);
+            return rgb;
+        }
+        else if (source.Channels() == 1)
+        {
+            // 灰度转 RGB
+            var rgb = new Mat();
+            Cv2.CvtColor(source, rgb, ColorConversionCodes.GRAY2BGR);
+            return rgb;
+        }
+        else
+        {
+            // 不支持的格式，返回原图
+            return source.Clone();
+        }
+    }
+
+    /// <summary>
     /// 识别指定区域的文本
     /// </summary>
     public OcrResult RecognizeRegion(Bitmap screenshot, OcrRegion region)
@@ -121,8 +153,11 @@ public class OcrService : IDisposable
             // 转换为 Mat
             using var mat = BitmapConverter.ToMat(cropped);
 
+            // 转换 RGBA 到 RGB（如果需要）
+            using var rgbMat = ConvertToRgb(mat);
+
             // 识别
-            var result = _ocr.Run(mat);
+            var result = _ocr.Run(rgbMat);
 
             if (result.Regions.Length == 0)
             {
@@ -174,8 +209,11 @@ public class OcrService : IDisposable
             // 转换为 Mat
             using var mat = BitmapConverter.ToMat(image);
 
+            // 转换 RGBA 到 RGB（如果需要）
+            using var rgbMat = ConvertToRgb(mat);
+
             // 识别
-            var result = _ocr.Run(mat);
+            var result = _ocr.Run(rgbMat);
 
             if (result.Regions.Length == 0)
             {
